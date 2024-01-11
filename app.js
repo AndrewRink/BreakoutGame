@@ -1,10 +1,21 @@
 const grid = document.querySelector('.grid')
+const scoreDisplay = document.querySelector('#score')
 const blockWidth = 100
 const blockHeight = 20
+const ballDiameter = 20
 const boardWidth = 560
+const boardHeight = 300
+let xDirection = -2
+let yDirection = 2
 
 const userStart = [230, 10]
 let currentPosition = userStart
+
+const ballStart = [270, 40]
+let ballCurrentPosition = ballStart
+
+let timerId
+
 
 //create block
 class Block {
@@ -52,14 +63,19 @@ addBlocks()
 //add User
 const user = document.createElement('div')
 user.classList.add('user')
-drawUser()
 grid.appendChild(user)
+drawUser()
 
 //draw user
 function drawUser() {
     user.style.left = currentPosition[0] + 'px'
     user.style.bottom = currentPosition[1] + 'px'
+}
 
+//draw ball
+function drawBall () {
+    ball.style.left = ballCurrentPosition[0] + 'px'
+    ball.style.bottom = ballCurrentPosition[1] + 'px'
 }
 
 //move User
@@ -88,3 +104,52 @@ document.addEventListener('keydown', moveUser)
 const ball = document.createElement('div')
 ball.classList.add('ball')
 grid.appendChild(ball)
+drawBall()
+
+//move ball
+function moveBall() {
+    ballCurrentPosition[0] += xDirection
+    ballCurrentPosition[1] += yDirection
+    drawBall()
+    checkforCollisions()
+}
+
+timerId = setInterval(moveBall, 30)
+
+//check for collision
+function checkforCollisions () {
+    //check for wall collisions
+    if (
+        ballCurrentPosition[0] >= (boardWidth - ballDiameter) ||  
+        ballCurrentPosition [0] <= 0 ||
+        ballCurrentPosition[1] >= (boardHeight - ballDiameter) 
+        ) {
+        changeDirection()
+    }
+
+    //check for game over
+    if (ballCurrentPosition[1] <= 0 ) {
+        clearInterval(timerId)
+        scoreDisplay.innerHtml = 'You Lose'
+        document.removeEventListener('keydown', moveUser)
+    }
+}
+
+
+function changeDirection() {
+    if (xDirection === 2 && yDirection === 2) {
+        yDirection = -2
+        return
+    }
+    if (xDirection === 2 && yDirection === -2) {
+        xDirection = -2
+        return
+    }
+    if (xDirection === -2 && yDirection === -2) {
+        yDirection = 2
+        return
+    }
+    if ( xDirection === -2 && yDirection === 2) {
+        xDirection = 2
+        return
+    } }
